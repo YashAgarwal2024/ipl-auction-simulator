@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPL Auction Arena</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Rajdhani:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-gray-950 text-white overflow-auto" style="font-family: 'Rajdhani', sans-serif;">
+  <div id="app" class="min-h-full w-full bg-gradient-to-br from-gray-950 via-purple-950 to-gray-950"><!-- Header -->
+   <header class="relative py-6 px-4 text-center border-b border-purple-500/30">
+    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/10 to-transparent"></div>
+    <h1 id="main-title" class="text-4xl md:text-6xl font-black neon-text" style="font-family: 'Orbitron', sans-serif; color: #00f5ff;">🏏 IPL AUCTION ARENA 🏏</h1>
+    <p class="text-purple-300 mt-2 text-lg">The Ultimate Cricket Auction Experience</p>
+   </header><!-- Main Content -->
+   <main class="p-4 max-w-7xl mx-auto"><!-- Team Setup Section -->
+    <section id="team-setup" class="mb-8">
+     <div class="neon-border rounded-xl p-6 bg-gray-900/80 backdrop-blur">
+      <h2 class="text-2xl font-bold text-pink-400 mb-4" style="font-family: 'Orbitron', sans-serif;">📋 TEAM SETUP</h2>
+      <div class="flex flex-wrap gap-4 mb-4"><input type="text" id="team-name-input" placeholder="Enter Team Name" maxlength="25" class="flex-1 min-w-48 px-4 py-3 rounded-lg bg-gray-800 border-2 border-cyan-500/50 text-white placeholder-gray-400 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"> <input type="number" id="team-purse-input" placeholder="Purse (Cr)" min="50" max="200" value="100" class="w-32 px-4 py-3 rounded-lg bg-gray-800 border-2 border-pink-500/50 text-white placeholder-gray-400 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-400/30"> <button type="button" id="add-team-btn" class="px-6 py-3 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 font-bold text-white hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 cursor-pointer"> + ADD TEAM </button>
+      </div>
+      <p id="team-count" class="text-gray-400 text-sm">Teams: 0/10</p><!-- Teams Display -->
+      <div id="teams-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+      </div>
+     </div>
+    </section><!-- Start Auction Button -->
+    <div id="start-auction-container" class="text-center mb-8 hidden"><button onclick="startAuction()" class="px-10 py-4 rounded-xl bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 font-black text-xl hover:scale-105 transition-transform shadow-2xl shadow-purple-500/50" style="font-family: 'Orbitron', sans-serif;"> 🚀 START AUCTION 🚀 </button>
+    </div><!-- Auction Section -->
+    <section id="auction-section" class="hidden"><!-- Current Player -->
+     <div id="current-player-section" class="mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><!-- Player Details Box -->
+       <div class="lg:col-span-2 neon-border rounded-xl p-6 bg-gray-900/80 backdrop-blur">
+        <h2 class="text-2xl font-bold text-cyan-400 mb-6" style="font-family: 'Orbitron', sans-serif;">🎯 CURRENT PLAYER</h2>
+        <div id="current-player-card" class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-8 border border-purple-500/30">
+         <div class="flex flex-col md:flex-row items-center gap-8">
+          <div id="player-avatar" class="w-32 h-32 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center text-7xl shadow-lg shadow-cyan-500/30">
+           🏏
+          </div>
+          <div class="flex-1 text-center md:text-left">
+           <h3 id="player-name" class="text-4xl font-black text-white player-blink" style="font-family: 'Orbitron', sans-serif;">Select a player</h3>
+           <div class="flex flex-wrap gap-4 mt-4 justify-center md:justify-start"><span id="player-country" class="px-4 py-2 rounded-full bg-blue-600/30 text-blue-300 font-bold">🌍 Country</span> <span id="player-role" class="px-4 py-2 rounded-full bg-green-600/30 text-green-300 font-bold">Role</span> <span id="player-type" class="px-4 py-2 rounded-full bg-orange-600/30 text-orange-300 font-bold">Type</span>
+           </div>
+           <div id="player-stats-container" class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-gray-300 hidden">
+           </div>
+           <div class="mt-6 bg-gray-700/50 rounded-lg p-4"><span id="base-price-label" class="text-gray-300 text-lg">Base Price:</span> <span id="player-base-price" class="text-3xl font-black text-yellow-400 ml-3">₹0 Cr</span>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div><!-- Bidding & Controls Box -->
+       <div class="neon-border rounded-xl p-6 bg-gray-900/80 backdrop-blur">
+        <h2 class="text-2xl font-bold text-pink-400 mb-4" style="font-family: 'Orbitron', sans-serif;">⚡ BIDDING ZONE</h2><!-- Current Bid Display -->
+        <div class="bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-lg p-3 mb-4 border border-green-500/30">
+         <p class="text-gray-400 text-xs mb-1">Current Bid</p>
+         <p id="current-bid" class="text-3xl font-black text-green-400">₹0 Cr</p>
+        </div><!-- Bid Increment Buttons - All in one line -->
+        <div class="flex gap-1 mb-4 justify-center"><button id="bid-025-btn" class="px-2 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 font-bold text-white transition-colors text-xs">+0.25</button> <button id="bid-05-btn" class="px-2 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 font-bold text-white transition-colors text-xs">+0.5</button> <button id="bid-1-btn" class="px-2 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 font-bold text-white transition-colors text-xs">+1</button> <button id="bid-2-btn" class="px-2 py-1.5 rounded-lg bg-pink-600 hover:bg-pink-500 font-bold text-white transition-colors text-xs">+2</button>
+        </div><!-- Team Selection - 5 buttons per line -->
+        <div class="mb-4">
+         <p class="text-gray-400 text-xs font-bold mb-2">Select Team:</p>
+         <div id="team-buttons" class="grid gap-1">
+         </div>
+        </div><!-- Action Buttons - All in one line -->
+        <div class="flex gap-1 justify-center"><button id="sold-btn" class="px-2 py-1.5 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 font-bold text-white hover:from-green-400 hover:to-emerald-500 shadow-lg shadow-green-500/30 transition-all text-xs">✅ SOLD</button> <button id="unsold-btn" class="px-2 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 font-bold text-white hover:from-red-400 hover:to-rose-500 shadow-lg shadow-red-500/30 transition-all text-xs">❌ UNSOLD</button> <button id="skip-btn" class="px-2 py-1.5 rounded-lg bg-gradient-to-r from-gray-600 to-gray-700 font-bold text-white hover:from-gray-500 hover:to-gray-600 transition-all text-xs">⏭️ SKIP</button>
+        </div>
+       </div>
+      </div>
+     </div>
+    </section>
+   </main>
+  </div><!-- Team Purses -->
+  <div class="mb-8">
+   <div class="neon-border rounded-xl p-6 bg-gray-900/80 backdrop-blur">
+    <h2 class="text-2xl font-bold text-pink-400 mb-4" style="font-family: 'Orbitron', sans-serif;">💰 LIVE PURSE TRACKER</h2>
+    <div id="purse-tracker" class="space-y-4">
+    </div>
+   </div>
+  </div><!-- Players Lists -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"><!-- Available Players -->
+   <div class="neon-border rounded-xl p-6 bg-gray-900/80 backdrop-blur">
+    <h2 class="text-xl font-bold text-cyan-400 mb-4" style="font-family: 'Orbitron', sans-serif;">📋 AVAILABLE PLAYERS (<span id="available-count">0</span>)</h2>
+    <div class="mb-4 flex flex-wrap gap-2"><select id="filter-country" onchange="filterPlayers()" class="px-3 py-2 rounded-lg bg-gray-800 border border-cyan-500/50 text-white text-sm"> <option value="">All Countries</option> </select> <select id="filter-role" onchange="filterPlayers()" class="px-3 py-2 rounded-lg bg-gray-800 border border-pink-500/50 text-white text-sm"> <option value="">All Roles</option> <option value="Batsman">Batsman</option> <option value="Bowler">Bowler</option> <option value="All-rounder">All-rounder</option> <option value="Wicketkeeper">Wicketkeeper</option> </select>
+    </div>
+    <div id="available-players" class="max-h-96 overflow-y-auto space-y-2 pr-2">
+    </div>
+   </div><!-- Sold Players -->
+   <div class="neon-border rounded-xl p-6 bg-gray-900/80 backdrop-blur">
+    <h2 class="text-xl font-bold text-green-400 mb-4" style="font-family: 'Orbitron', sans-serif;">✅ SOLD PLAYERS (<span id="sold-count">0</span>)</h2>
+    <div id="sold-players" class="max-h-96 overflow-y-auto space-y-2 pr-2">
+     <p class="text-gray-500 text-center py-8">No players sold yet</p>
+    </div>
+   </div>
+  </div><!-- Unsold Players -->
+  <div class="mb-8">
+   <div class="neon-border rounded-xl p-6 bg-gray-900/80 backdrop-blur">
+    <h2 class="text-xl font-bold text-red-400 mb-4" style="font-family: 'Orbitron', sans-serif;">❌ UNSOLD PLAYERS (<span id="unsold-count">0</span>)</h2>
+    <div id="unsold-players" class="max-h-64 overflow-y-auto">
+     <div class="flex flex-wrap gap-2">
+      <p class="text-gray-500 text-center py-4 w-full">No unsold players yet</p>
+     </div>
+    </div>
+   </div>
+  </div><!-- Footer -->
+  <footer class="py-4 text-center border-t border-purple-500/30 text-gray-500 text-sm">
+   <p>made by Yash agarwal </p>
+  </footer>
+  <script>
+    // Configuration
+    const defaultConfig = {
+      main_title: '🏏 IPL AUCTION ARENA 🏏',
+      base_price_label: 'Base Price'
+    };
+
+    // Element SDK initialization
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (config) => {
+          document.getElementById('main-title').textContent = config.main_title || defaultConfig.main_title;
+          document.getElementById('base-price-label').textContent = (config.base_price_label || defaultConfig.base_price_label) + ':';
+        },
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ['main_title', config.main_title || defaultConfig.main_title],
+          ['base_price_label', config.base_price_label || defaultConfig.base_price_label]
+        ])
+      });
+    }
+
+    // Hardcoded player stats
+    const playerStatsDB = {
+      'Virat Kohli': { matches: 156, runs: 6736, strikeRate: 144.28, highestScore: 120 },
+      'Rohit Sharma': { matches: 152, runs: 6348, strikeRate: 138.45, highestScore: 118 },
+      'Jasprit Bumrah': { matches: 110, wickets: 160, economy: 6.73, bestFigure: '6/19' },
+      'Hardik Pandya': { matches: 107, runs: 2920, strikeRate: 142.33, highestScore: 91, wickets: 109, economy: 7.41, bestFigure: '4/25' },
+      'Ravindra Jadeja': { matches: 168, runs: 2447, strikeRate: 131.23, highestScore: 62, wickets: 194, economy: 7.05, bestFigure: '5/16' },
+      'KL Rahul': { matches: 147, runs: 5254, strikeRate: 133.15, highestScore: 132, catches: 58, stumpings: 3 },
+      'Rishabh Pant': { matches: 99, runs: 3284, strikeRate: 145.73, highestScore: 128, catches: 76, stumpings: 5 },
+      'Shubman Gill': { matches: 68, runs: 2619, strikeRate: 141.88, highestScore: 96 },
+      'Mohammed Shami': { matches: 58, wickets: 83, economy: 6.89, bestFigure: '5/22' },
+      'Ravichandran Ashwin': { matches: 155, runs: 1949, strikeRate: 123.41, highestScore: 68, wickets: 171, economy: 6.54, bestFigure: '6/26' },
+      'Yashasvi Jaiswal': { matches: 32, runs: 1465, strikeRate: 145.50, highestScore: 107 },
+      'Mohammed Siraj': { matches: 49, wickets: 67, economy: 7.12, bestFigure: '4/21' },
+      'Shreyas Iyer': { matches: 87, runs: 2806, strikeRate: 137.42, highestScore: 105 },
+      'Suryakumar Yadav': { matches: 93, runs: 3531, strikeRate: 151.29, highestScore: 117 },
+      'Kuldeep Yadav': { matches: 71, wickets: 95, economy: 7.28, bestFigure: '6/25' },
+      'Ishan Kishan': { matches: 92, runs: 3132, strikeRate: 146.89, highestScore: 113, catches: 64, stumpings: 4 },
+      'Sanju Samson': { matches: 125, runs: 4178, strikeRate: 142.56, highestScore: 119, catches: 81, stumpings: 6 },
+      'Axar Patel': { matches: 95, runs: 2574, strikeRate: 135.19, highestScore: 84, wickets: 112, economy: 7.34, bestFigure: '4/22' },
+      'Yuzvendra Chahal': { matches: 169, wickets: 219, economy: 7.41, bestFigure: '5/40' },
+      'Abhishek Sharma': { matches: 57, runs: 1687, strikeRate: 148.41, highestScore: 88 },
+      'Ravi Bishnoi': { matches: 48, wickets: 62, economy: 6.98, bestFigure: '5/23' },
+      'Arshdeep Singh': { matches: 32, wickets: 44, economy: 7.65, bestFigure: '4/20' },
+      'Prasidh Krishna': { matches: 28, wickets: 38, economy: 7.89, bestFigure: '3/18' },
+      'Mukesh Kumar': { matches: 25, wickets: 31, economy: 7.45, bestFigure: '3/22' },
+      'Avesh Khan': { matches: 58, wickets: 72, economy: 7.68, bestFigure: '4/24' },
+      'Navdeep Saini': { matches: 41, wickets: 53, economy: 7.82, bestFigure: '4/19' },
+      'Karun Nair': { matches: 63, runs: 1922, strikeRate: 130.27, highestScore: 88 },
+      'Ajinkya Rahane': { matches: 118, runs: 3848, strikeRate: 128.16, highestScore: 108 },
+      'Cheteshwar Pujara': { matches: 96, runs: 2667, strikeRate: 121.93, highestScore: 101 },
+      'Hanuma Vihari': { matches: 72, runs: 2301, strikeRate: 126.54, highestScore: 93 },
+      'Devdutt Padikkal': { matches: 58, runs: 1876, strikeRate: 142.86, highestScore: 99 },
+      'Ruturaj Gaikwad': { matches: 74, runs: 2591, strikeRate: 139.18, highestScore: 114 },
+      'Prithvi Shaw': { matches: 65, runs: 2523, strikeRate: 148.77, highestScore: 106 },
+      'Tilak Varma': { matches: 48, runs: 1523, strikeRate: 141.03, highestScore: 87 },
+      'Rahul Tripathi': { matches: 81, runs: 2934, strikeRate: 140.29, highestScore: 108 },
+      'Sai Sudharsan': { matches: 52, runs: 1687, strikeRate: 138.93, highestScore: 92 },
+      'Riyan Parag': { matches: 59, runs: 1876, strikeRate: 145.22, highestScore: 94, wickets: 47, economy: 8.12, bestFigure: '3/24' },
+      'Washington Sundar': { matches: 78, runs: 1523, strikeRate: 128.77, highestScore: 71, wickets: 89, economy: 7.41, bestFigure: '4/27' },
+      'Shardul Thakur': { matches: 92, runs: 2104, strikeRate: 135.64, highestScore: 79, wickets: 123, economy: 7.65, bestFigure: '5/28' },
+      'Jaydev Unadkat': { matches: 68, wickets: 91, economy: 7.42, bestFigure: '5/26' },
+      'Varun Chakaravarthy': { matches: 54, wickets: 71, economy: 7.15, bestFigure: '4/20' },
+      'Harshit Rana': { matches: 41, wickets: 52, economy: 7.87, bestFigure: '4/23' },
+      'Deepak Chahar': { matches: 66, wickets: 86, economy: 7.34, bestFigure: '5/21' },
+      'Umran Malik': { matches: 38, wickets: 48, economy: 8.01, bestFigure: '4/25' },
+      'Siddhesh Lad': { matches: 35, runs: 892, strikeRate: 125.35, highestScore: 64 },
+      'Anmolpreet Singh': { matches: 42, runs: 1234, strikeRate: 132.74, highestScore: 71 },
+      'Nikhil Chaudhary': { matches: 28, wickets: 34, economy: 8.23, bestFigure: '3/19' },
+      'Pat Cummins': { matches: 87, runs: 2456, strikeRate: 128.74, highestScore: 98, wickets: 110, economy: 7.23, bestFigure: '5/24' },
+      'Steve Smith': { matches: 142, runs: 5847, strikeRate: 135.42, highestScore: 121 },
+      'David Warner': { matches: 156, runs: 6084, strikeRate: 141.29, highestScore: 124 },
+      'Glenn Maxwell': { matches: 124, runs: 4381, strikeRate: 153.56, highestScore: 128, wickets: 68, economy: 8.45, bestFigure: '3/21' },
+      'Mitchell Starc': { matches: 98, wickets: 142, economy: 7.18, bestFigure: '6/20' },
+      'Travis Head': { matches: 73, runs: 3421, strikeRate: 148.95, highestScore: 118 },
+      'Josh Hazlewood': { matches: 78, wickets: 101, economy: 6.87, bestFigure: '5/18' },
+      'Marcus Stoinis': { matches: 95, runs: 3127, strikeRate: 141.18, highestScore: 108, wickets: 74, economy: 7.92, bestFigure: '4/26' },
+      'Cameron Green': { matches: 68, runs: 2843, strikeRate: 142.76, highestScore: 112, wickets: 79, economy: 7.54, bestFigure: '4/28' },
+      'Adam Zampa': { matches: 112, wickets: 154, economy: 7.35, bestFigure: '5/19' },
+      'Marnus Labuschagne': { matches: 64, runs: 2681, strikeRate: 130.24, highestScore: 102 },
+      'Alex Carey': { matches: 82, runs: 2934, strikeRate: 137.41, highestScore: 108, catches: 71, stumpings: 7 },
+      'Joe Root': { matches: 151, runs: 6204, strikeRate: 138.65, highestScore: 122 },
+      'Ben Stokes': { matches: 138, runs: 4956, strikeRate: 145.23, highestScore: 124, wickets: 142, economy: 7.41, bestFigure: '5/27' },
+      'Jofra Archer': { matches: 68, wickets: 87, economy: 7.56, bestFigure: '4/22' },
+      'Jos Buttler': { matches: 147, runs: 5541, strikeRate: 149.82, highestScore: 124, catches: 98, stumpings: 8 },
+      'Moeen Ali': { matches: 121, runs: 3876, strikeRate: 141.34, highestScore: 116, wickets: 108, economy: 7.28, bestFigure: '5/21' },
+      'Jonny Bairstow': { matches: 103, runs: 4123, strikeRate: 146.29, highestScore: 117, catches: 76, stumpings: 5 },
+      'Mark Wood': { matches: 84, wickets: 109, economy: 7.42, bestFigure: '5/24' },
+      'Harry Brook': { matches: 56, runs: 2341, strikeRate: 143.81, highestScore: 104 },
+      'Adil Rashid': { matches: 97, wickets: 126, economy: 7.19, bestFigure: '5/23' },
+      'Liam Livingstone': { matches: 79, runs: 2967, strikeRate: 151.76, highestScore: 109, wickets: 62, economy: 8.34, bestFigure: '3/22' },
+      'Sam Curran': { matches: 103, runs: 2756, strikeRate: 139.45, highestScore: 101, wickets: 98, economy: 7.61, bestFigure: '4/25' },
+      'Phil Salt': { matches: 61, runs: 2467, strikeRate: 147.89, highestScore: 109, catches: 52, stumpings: 6 },
+      'Quinton de Kock': { matches: 139, runs: 5087, strikeRate: 144.23, highestScore: 126, catches: 104, stumpings: 9 },
+      'Kagiso Rabada': { matches: 96, wickets: 126, economy: 7.34, bestFigure: '5/26' },
+      'Aiden Markram': { matches: 89, runs: 3456, strikeRate: 137.28, highestScore: 113 },
+      'David Miller': { matches: 112, runs: 4321, strikeRate: 148.92, highestScore: 124 },
+      'Anrich Nortje': { matches: 72, wickets: 94, economy: 7.21, bestFigure: '4/21' },
+      'Marco Jansen': { matches: 58, runs: 1876, strikeRate: 139.41, highestScore: 89, wickets: 72, economy: 7.89, bestFigure: '4/24' },
+      'Heinrich Klaasen': { matches: 76, runs: 2987, strikeRate: 149.56, highestScore: 114, catches: 64, stumpings: 4 },
+      'Lungi Ngidi': { matches: 52, wickets: 68, economy: 7.45, bestFigure: '4/19' },
+      'Rassie van der Dussen': { matches: 68, runs: 2456, strikeRate: 134.72, highestScore: 99 },
+      'Tristan Stubbs': { matches: 44, runs: 1678, strikeRate: 142.88, highestScore: 87 },
+      'Kane Williamson': { matches: 148, runs: 5923, strikeRate: 136.89, highestScore: 119 },
+      'Trent Boult': { matches: 102, wickets: 132, economy: 6.98, bestFigure: '5/22' },
+      'Devon Conway': { matches: 73, runs: 2876, strikeRate: 139.12, highestScore: 109 },
+      'Tim Southee': { matches: 92, wickets: 118, economy: 7.41, bestFigure: '5/28' },
+      'Glenn Phillips': { matches: 64, runs: 2234, strikeRate: 145.67, highestScore: 98 },
+      'Mitchell Santner': { matches: 89, runs: 2145, strikeRate: 131.23, highestScore: 76, wickets: 105, economy: 7.12, bestFigure: '5/21' },
+      'Daryl Mitchell': { matches: 76, runs: 2876, strikeRate: 140.28, highestScore: 107, wickets: 68, economy: 7.67, bestFigure: '4/26' },
+      'Lockie Ferguson': { matches: 66, wickets: 89, economy: 7.34, bestFigure: '4/25' },
+      'Rachin Ravindra': { matches: 52, runs: 1987, strikeRate: 138.45, highestScore: 92, wickets: 58, economy: 7.89, bestFigure: '3/24' },
+      'Matt Henry': { matches: 48, wickets: 61, economy: 7.56, bestFigure: '4/20' },
+      'Nicholas Pooran': { matches: 104, runs: 3876, strikeRate: 150.32, highestScore: 122, catches: 72, stumpings: 5 },
+      'Andre Russell': { matches: 117, runs: 3901, strikeRate: 152.54, highestScore: 128, wickets: 112, economy: 7.98, bestFigure: '5/29' },
+      'Shimron Hetmyer': { matches: 81, runs: 2945, strikeRate: 146.88, highestScore: 114 },
+      'Alzarri Joseph': { matches: 67, wickets: 86, economy: 7.72, bestFigure: '4/24' },
+      'Shai Hope': { matches: 92, runs: 3421, strikeRate: 135.67, highestScore: 112, catches: 68, stumpings: 3 },
+      'Kyle Mayers': { matches: 49, runs: 1678, strikeRate: 141.89, highestScore: 91, wickets: 42, economy: 8.23, bestFigure: '3/21' },
+      'Roston Chase': { matches: 73, runs: 2234, strikeRate: 128.92, highestScore: 87, wickets: 84, economy: 7.45, bestFigure: '4/23' },
+      'Akeal Hosein': { matches: 45, wickets: 58, economy: 7.34, bestFigure: '4/21' },
+      'Romario Shepherd': { matches: 38, runs: 876, strikeRate: 132.42, highestScore: 62, wickets: 52, economy: 7.89, bestFigure: '3/24' },
+      'Gudakesh Motie': { matches: 32, wickets: 41, economy: 7.67, bestFigure: '3/22' },
+      'Wanindu Hasaranga': { matches: 97, runs: 2456, strikeRate: 141.23, highestScore: 98, wickets: 123, economy: 7.21, bestFigure: '5/24' },
+      'Pathum Nissanka': { matches: 68, runs: 2487, strikeRate: 138.91, highestScore: 103 },
+      'Kusal Mendis': { matches: 84, runs: 3123, strikeRate: 139.54, highestScore: 114, catches: 71, stumpings: 4 },
+      'Charith Asalanka': { matches: 61, runs: 1987, strikeRate: 134.28, highestScore: 88 },
+      'Dushmantha Chameera': { matches: 58, wickets: 75, economy: 7.45, bestFigure: '4/23' },
+      'Maheesh Theekshana': { matches: 52, wickets: 66, economy: 7.18, bestFigure: '4/21' },
+      'Dasun Shanaka': { matches: 79, runs: 2134, strikeRate: 136.92, highestScore: 91, wickets: 89, economy: 7.67, bestFigure: '4/25' },
+      'Matheesha Pathirana': { matches: 44, wickets: 56, economy: 7.32, bestFigure: '4/19' },
+      'Rashid Khan': { matches: 121, wickets: 167, economy: 6.89, bestFigure: '6/28' },
+      'Mohammad Nabi': { matches: 98, runs: 2876, strikeRate: 132.41, highestScore: 102, wickets: 104, economy: 7.34, bestFigure: '5/23' },
+      'Rahmanullah Gurbaz': { matches: 62, runs: 2341, strikeRate: 145.89, highestScore: 108, catches: 58, stumpings: 3 },
+      'Fazalhaq Farooqi': { matches: 48, wickets: 62, economy: 7.56, bestFigure: '4/22' },
+      'Naveen-ul-Haq': { matches: 51, wickets: 67, economy: 7.89, bestFigure: '4/24' },
+      'Ibrahim Zadran': { matches: 55, runs: 1876, strikeRate: 137.45, highestScore: 93 }
+    };
+
+    // Function to get player stats
+    function getPlayerStats(playerName) {
+      return playerStatsDB[playerName] || null;
+    }
+
+    // International Players Database (100+ players - India focused + other nations)
+    const allPlayers = [
+      // India - International Stars (15 players)
+      { name: 'Virat Kohli', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 2, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Rohit Sharma', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 2, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Jasprit Bumrah', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 2, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Hardik Pandya', country: 'India', role: 'All-rounder', type: 'Domestic', basePrice: 2, flag: '🇮🇳', icon: '💪' },
+      { name: 'Ravindra Jadeja', country: 'India', role: 'All-rounder', type: 'Domestic', basePrice: 2, flag: '🇮🇳', icon: '💪' },
+      { name: 'KL Rahul', country: 'India', role: 'Wicketkeeper', type: 'Domestic', basePrice: 2, flag: '🇮🇳', icon: '🧤' },
+      { name: 'Rishabh Pant', country: 'India', role: 'Wicketkeeper', type: 'Domestic', basePrice: 2, flag: '🇮🇳', icon: '🧤' },
+      { name: 'Shubman Gill', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1.5, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Mohammed Shami', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1.5, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Ravichandran Ashwin', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1.5, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Yashasvi Jaiswal', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Mohammed Siraj', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Shreyas Iyer', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1.5, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Suryakumar Yadav', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1.5, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Kuldeep Yadav', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🎯' },
+
+      // India - Domestic Talent (30+ players)
+      { name: 'Ishan Kishan', country: 'India', role: 'Wicketkeeper', type: 'Domestic', basePrice: 1.5, flag: '🇮🇳', icon: '🧤' },
+      { name: 'Sanju Samson', country: 'India', role: 'Wicketkeeper', type: 'Domestic', basePrice: 1.5, flag: '🇮🇳', icon: '🧤' },
+      { name: 'Axar Patel', country: 'India', role: 'All-rounder', type: 'Domestic', basePrice: 1.5, flag: '🇮🇳', icon: '💪' },
+      { name: 'Yuzvendra Chahal', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Abhishek Sharma', country: 'India', role: 'All-rounder', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '💪' },
+      { name: 'Ravi Bishnoi', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Arshdeep Singh', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Prasidh Krishna', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Mukesh Kumar', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Avesh Khan', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Navdeep Saini', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Karun Nair', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Ajinkya Rahane', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Cheteshwar Pujara', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 0.5, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Hanuma Vihari', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Devdutt Padikkal', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Ruturaj Gaikwad', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1.25, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Prithvi Shaw', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Tilak Varma', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Rahul Tripathi', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Sai Sudharsan', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Riyan Parag', country: 'India', role: 'All-rounder', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '💪' },
+      { name: 'Washington Sundar', country: 'India', role: 'All-rounder', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '💪' },
+      { name: 'Shardul Thakur', country: 'India', role: 'All-rounder', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '💪' },
+      { name: 'Jaydev Unadkat', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Varun Chakaravarthy', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Harshit Rana', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Deepak Chahar', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 1, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Umran Malik', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 0.75, flag: '🇮🇳', icon: '🎯' },
+      { name: 'Siddhesh Lad', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 0.5, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Anmolpreet Singh', country: 'India', role: 'Batsman', type: 'Domestic', basePrice: 0.5, flag: '🇮🇳', icon: '🏏' },
+      { name: 'Nikhil Chaudhary', country: 'India', role: 'Bowler', type: 'Domestic', basePrice: 0.5, flag: '🇮🇳', icon: '🎯' },
+      
+      // Australia (12 players)
+      { name: 'Pat Cummins', country: 'Australia', role: 'Bowler', type: 'Overseas', basePrice: 2, flag: '🇦🇺', icon: '🎯' },
+      { name: 'Steve Smith', country: 'Australia', role: 'Batsman', type: 'Overseas', basePrice: 2, flag: '🇦🇺', icon: '🏏' },
+      { name: 'David Warner', country: 'Australia', role: 'Batsman', type: 'Overseas', basePrice: 2, flag: '🇦🇺', icon: '🏏' },
+      { name: 'Glenn Maxwell', country: 'Australia', role: 'All-rounder', type: 'Overseas', basePrice: 2, flag: '🇦🇺', icon: '💪' },
+      { name: 'Mitchell Starc', country: 'Australia', role: 'Bowler', type: 'Overseas', basePrice: 2, flag: '🇦🇺', icon: '🎯' },
+      { name: 'Travis Head', country: 'Australia', role: 'Batsman', type: 'Overseas', basePrice: 1.5, flag: '🇦🇺', icon: '🏏' },
+      { name: 'Josh Hazlewood', country: 'Australia', role: 'Bowler', type: 'Overseas', basePrice: 1.5, flag: '🇦🇺', icon: '🎯' },
+      { name: 'Marcus Stoinis', country: 'Australia', role: 'All-rounder', type: 'Overseas', basePrice: 1, flag: '🇦🇺', icon: '💪' },
+      { name: 'Cameron Green', country: 'Australia', role: 'All-rounder', type: 'Overseas', basePrice: 1.5, flag: '🇦🇺', icon: '💪' },
+      { name: 'Adam Zampa', country: 'Australia', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🇦🇺', icon: '🎯' },
+      { name: 'Marnus Labuschagne', country: 'Australia', role: 'Batsman', type: 'Overseas', basePrice: 1, flag: '🇦🇺', icon: '🏏' },
+      { name: 'Alex Carey', country: 'Australia', role: 'Wicketkeeper', type: 'Overseas', basePrice: 1, flag: '🇦🇺', icon: '🧤' },
+      
+      // England (12 players)
+      { name: 'Joe Root', country: 'England', role: 'Batsman', type: 'Overseas', basePrice: 2, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '🏏' },
+      { name: 'Ben Stokes', country: 'England', role: 'All-rounder', type: 'Overseas', basePrice: 2, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '💪' },
+      { name: 'Jofra Archer', country: 'England', role: 'Bowler', type: 'Overseas', basePrice: 1.5, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '🎯' },
+      { name: 'Jos Buttler', country: 'England', role: 'Wicketkeeper', type: 'Overseas', basePrice: 2, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '🧤' },
+      { name: 'Moeen Ali', country: 'England', role: 'All-rounder', type: 'Overseas', basePrice: 1, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '💪' },
+      { name: 'Jonny Bairstow', country: 'England', role: 'Wicketkeeper', type: 'Overseas', basePrice: 1.5, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '🧤' },
+      { name: 'Mark Wood', country: 'England', role: 'Bowler', type: 'Overseas', basePrice: 1.5, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '🎯' },
+      { name: 'Harry Brook', country: 'England', role: 'Batsman', type: 'Overseas', basePrice: 1.5, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '🏏' },
+      { name: 'Adil Rashid', country: 'England', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '🎯' },
+      { name: 'Liam Livingstone', country: 'England', role: 'All-rounder', type: 'Overseas', basePrice: 1.5, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '💪' },
+      { name: 'Sam Curran', country: 'England', role: 'All-rounder', type: 'Overseas', basePrice: 1.5, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '💪' },
+      { name: 'Phil Salt', country: 'England', role: 'Wicketkeeper', type: 'Overseas', basePrice: 1, flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', icon: '🧤' },
+      
+      // South Africa (10 players)
+      { name: 'Quinton de Kock', country: 'South Africa', role: 'Wicketkeeper', type: 'Overseas', basePrice: 2, flag: '🇿🇦', icon: '🧤' },
+      { name: 'Kagiso Rabada', country: 'South Africa', role: 'Bowler', type: 'Overseas', basePrice: 2, flag: '🇿🇦', icon: '🎯' },
+      { name: 'Aiden Markram', country: 'South Africa', role: 'Batsman', type: 'Overseas', basePrice: 1.5, flag: '🇿🇦', icon: '🏏' },
+      { name: 'David Miller', country: 'South Africa', role: 'Batsman', type: 'Overseas', basePrice: 1.5, flag: '🇿🇦', icon: '🏏' },
+      { name: 'Anrich Nortje', country: 'South Africa', role: 'Bowler', type: 'Overseas', basePrice: 1.5, flag: '🇿🇦', icon: '🎯' },
+      { name: 'Marco Jansen', country: 'South Africa', role: 'All-rounder', type: 'Overseas', basePrice: 1, flag: '🇿🇦', icon: '💪' },
+      { name: 'Heinrich Klaasen', country: 'South Africa', role: 'Wicketkeeper', type: 'Overseas', basePrice: 1.5, flag: '🇿🇦', icon: '🧤' },
+      { name: 'Lungi Ngidi', country: 'South Africa', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🇿🇦', icon: '🎯' },
+      { name: 'Rassie van der Dussen', country: 'South Africa', role: 'Batsman', type: 'Overseas', basePrice: 1, flag: '🇿🇦', icon: '🏏' },
+      { name: 'Tristan Stubbs', country: 'South Africa', role: 'Batsman', type: 'Overseas', basePrice: 0.75, flag: '🇿🇦', icon: '🏏' },
+      
+      // New Zealand (10 players)
+      { name: 'Kane Williamson', country: 'New Zealand', role: 'Batsman', type: 'Overseas', basePrice: 2, flag: '🇳🇿', icon: '🏏' },
+      { name: 'Trent Boult', country: 'New Zealand', role: 'Bowler', type: 'Overseas', basePrice: 2, flag: '🇳🇿', icon: '🎯' },
+      { name: 'Devon Conway', country: 'New Zealand', role: 'Batsman', type: 'Overseas', basePrice: 1.5, flag: '🇳🇿', icon: '🏏' },
+      { name: 'Tim Southee', country: 'New Zealand', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🇳🇿', icon: '🎯' },
+      { name: 'Glenn Phillips', country: 'New Zealand', role: 'Batsman', type: 'Overseas', basePrice: 1, flag: '🇳🇿', icon: '🏏' },
+      { name: 'Mitchell Santner', country: 'New Zealand', role: 'All-rounder', type: 'Overseas', basePrice: 1, flag: '🇳🇿', icon: '💪' },
+      { name: 'Daryl Mitchell', country: 'New Zealand', role: 'All-rounder', type: 'Overseas', basePrice: 1, flag: '🇳🇿', icon: '💪' },
+      { name: 'Lockie Ferguson', country: 'New Zealand', role: 'Bowler', type: 'Overseas', basePrice: 1.5, flag: '🇳🇿', icon: '🎯' },
+      { name: 'Rachin Ravindra', country: 'New Zealand', role: 'All-rounder', type: 'Overseas', basePrice: 1, flag: '🇳🇿', icon: '💪' },
+      { name: 'Matt Henry', country: 'New Zealand', role: 'Bowler', type: 'Overseas', basePrice: 0.75, flag: '🇳🇿', icon: '🎯' },
+      
+      // West Indies (10 players)
+      { name: 'Nicholas Pooran', country: 'West Indies', role: 'Wicketkeeper', type: 'Overseas', basePrice: 1.5, flag: '🇧🇧', icon: '🧤' },
+      { name: 'Andre Russell', country: 'West Indies', role: 'All-rounder', type: 'Overseas', basePrice: 2, flag: '🇧🇧', icon: '💪' },
+      { name: 'Shimron Hetmyer', country: 'West Indies', role: 'Batsman', type: 'Overseas', basePrice: 1, flag: '🇧🇧', icon: '🏏' },
+      { name: 'Alzarri Joseph', country: 'West Indies', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🇧🇧', icon: '🎯' },
+      { name: 'Shai Hope', country: 'West Indies', role: 'Wicketkeeper', type: 'Overseas', basePrice: 1, flag: '🇧🇧', icon: '🧤' },
+      { name: 'Kyle Mayers', country: 'West Indies', role: 'All-rounder', type: 'Overseas', basePrice: 0.75, flag: '🇧🇧', icon: '💪' },
+      { name: 'Roston Chase', country: 'West Indies', role: 'All-rounder', type: 'Overseas', basePrice: 0.75, flag: '🇧🇧', icon: '💪' },
+      { name: 'Akeal Hosein', country: 'West Indies', role: 'Bowler', type: 'Overseas', basePrice: 0.75, flag: '🇧🇧', icon: '🎯' },
+      { name: 'Romario Shepherd', country: 'West Indies', role: 'All-rounder', type: 'Overseas', basePrice: 0.5, flag: '🇧🇧', icon: '💪' },
+      { name: 'Gudakesh Motie', country: 'West Indies', role: 'Bowler', type: 'Overseas', basePrice: 0.5, flag: '🇧🇧', icon: '🎯' },
+      
+      // Sri Lanka (8 players)
+      { name: 'Wanindu Hasaranga', country: 'Sri Lanka', role: 'All-rounder', type: 'Overseas', basePrice: 1.5, flag: '🇱🇰', icon: '💪' },
+      { name: 'Pathum Nissanka', country: 'Sri Lanka', role: 'Batsman', type: 'Overseas', basePrice: 1, flag: '🇱🇰', icon: '🏏' },
+      { name: 'Kusal Mendis', country: 'Sri Lanka', role: 'Wicketkeeper', type: 'Overseas', basePrice: 1, flag: '🇱🇰', icon: '🧤' },
+      { name: 'Charith Asalanka', country: 'Sri Lanka', role: 'Batsman', type: 'Overseas', basePrice: 0.75, flag: '🇱🇰', icon: '🏏' },
+      { name: 'Dushmantha Chameera', country: 'Sri Lanka', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🇱🇰', icon: '🎯' },
+      { name: 'Maheesh Theekshana', country: 'Sri Lanka', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🇱🇰', icon: '🎯' },
+      { name: 'Dasun Shanaka', country: 'Sri Lanka', role: 'All-rounder', type: 'Overseas', basePrice: 0.75, flag: '🇱🇰', icon: '💪' },
+      { name: 'Matheesha Pathirana', country: 'Sri Lanka', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🇱🇰', icon: '🎯' },
+      
+      // Afghanistan (6 players)
+      { name: 'Rashid Khan', country: 'Afghanistan', role: 'Bowler', type: 'Overseas', basePrice: 2, flag: '🇦🇫', icon: '🎯' },
+      { name: 'Mohammad Nabi', country: 'Afghanistan', role: 'All-rounder', type: 'Overseas', basePrice: 1, flag: '🇦🇫', icon: '💪' },
+      { name: 'Rahmanullah Gurbaz', country: 'Afghanistan', role: 'Wicketkeeper', type: 'Overseas', basePrice: 1, flag: '🇦🇫', icon: '🧤' },
+      { name: 'Fazalhaq Farooqi', country: 'Afghanistan', role: 'Bowler', type: 'Overseas', basePrice: 1, flag: '🇦🇫', icon: '🎯' },
+      { name: 'Naveen-ul-Haq', country: 'Afghanistan', role: 'Bowler', type: 'Overseas', basePrice: 0.75, flag: '🇦🇫', icon: '🎯' },
+      { name: 'Ibrahim Zadran', country: 'Afghanistan', role: 'Batsman', type: 'Overseas', basePrice: 0.75, flag: '🇦🇫', icon: '🏏' }
+    ];
+
+    // State
+    let teams = [];
+    let availablePlayers = [...allPlayers];
+    let soldPlayers = [];
+    let unsoldPlayers = [];
+    let currentPlayer = null;
+    let currentBid = 0;
+    let currentBidder = null;
+    let auctionStarted = false;
+
+    // Attach event listeners after SDK init
+    function setupEventListeners() {
+      document.getElementById('add-team-btn').addEventListener('click', addTeam);
+      document.getElementById('bid-025-btn').addEventListener('click', () => placeBid(0.25));
+      document.getElementById('bid-05-btn').addEventListener('click', () => placeBid(0.5));
+      document.getElementById('bid-1-btn').addEventListener('click', () => placeBid(1));
+      document.getElementById('bid-2-btn').addEventListener('click', () => placeBid(2));
+      document.getElementById('sold-btn').addEventListener('click', soldPlayer);
+      document.getElementById('unsold-btn').addEventListener('click', unsoldPlayer);
+      document.getElementById('skip-btn').addEventListener('click', nextPlayer);
+    }
+
+    // Get unique countries for filter
+    const countries = [...new Set(allPlayers.map(p => p.country))].sort();
+
+    // Initialize country filter
+    function initFilters() {
+      const countryFilter = document.getElementById('filter-country');
+      countries.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        countryFilter.appendChild(option);
+      });
+    }
+
+    // Add Team
+    function addTeam() {
+      if (teams.length >= 10) {
+        showNotification('Maximum 10 teams allowed!', 'error');
+        return;
+      }
+
+      const nameInput = document.getElementById('team-name-input');
+      const purseInput = document.getElementById('team-purse-input');
+      
+      const name = nameInput.value.trim();
+      const purse = parseFloat(purseInput.value) || 100;
+
+      if (!name) {
+        showNotification('Please enter a team name!', 'error');
+        return;
+      }
+
+      if (teams.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+        showNotification('Team already exists!', 'error');
+        return;
+      }
+
+      const teamColors = [
+        'from-blue-500 to-cyan-500',
+        'from-purple-500 to-pink-500',
+        'from-orange-500 to-red-500',
+        'from-green-500 to-emerald-500',
+        'from-yellow-500 to-orange-500',
+        'from-indigo-500 to-purple-500',
+        'from-pink-500 to-rose-500',
+        'from-teal-500 to-green-500',
+        'from-red-500 to-pink-500',
+        'from-cyan-500 to-blue-500'
+      ];
+
+      teams.push({
+        name,
+        purse,
+        originalPurse: purse,
+        players: [],
+        color: teamColors[teams.length]
+      });
+
+      nameInput.value = '';
+      renderTeams();
+      updateTeamCount();
+      
+      if (teams.length >= 2) {
+        document.getElementById('start-auction-container').classList.remove('hidden');
+      }
+
+      showNotification(`Team "${name}" added successfully!`, 'success');
+    }
+
+    // Remove Team
+    function removeTeam(index) {
+      teams.splice(index, 1);
+      renderTeams();
+      updateTeamCount();
+      
+      if (teams.length < 2) {
+        document.getElementById('start-auction-container').classList.add('hidden');
+      }
+    }
+
+    // Update Team Count
+    function updateTeamCount() {
+      document.getElementById('team-count').textContent = `Teams: ${teams.length}/10`;
+    }
+
+    // Render Teams
+    function renderTeams() {
+      const container = document.getElementById('teams-container');
+      container.innerHTML = teams.map((team, index) => `
+        <div class="bg-gradient-to-r ${team.color} p-1 rounded-xl fade-in-up" style="animation-delay: ${index * 0.1}s">
+          <div class="bg-gray-900 rounded-lg p-4">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="font-bold text-lg text-white">${team.name}</h3>
+                <p class="text-sm text-gray-400">Purse: ₹${team.purse} Cr</p>
+              </div>
+              ${!auctionStarted ? `
+                <button onclick="removeTeam(${index})" class="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors">
+                  ✕
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Start Auction
+    function startAuction() {
+      if (teams.length < 2) {
+        showNotification('Add at least 2 teams to start!', 'error');
+        return;
+      }
+
+      auctionStarted = true;
+      document.getElementById('team-setup').classList.add('hidden');
+      document.getElementById('start-auction-container').classList.add('hidden');
+      document.getElementById('auction-section').classList.remove('hidden');
+      
+      updateBiddingTeamDropdown();
+      renderPurseTracker();
+      renderAvailablePlayers();
+      selectRandomPlayer();
+
+      showNotification('🎉 Auction has started! Let the bidding begin!', 'success');
+    }
+
+    // Update Bidding Team Dropdown
+    function updateBiddingTeamDropdown() {
+      const container = document.getElementById('team-buttons');
+      container.className = 'grid gap-1';
+      
+      const totalTeams = teams.length;
+      if (totalTeams <= 5) {
+        container.style.gridTemplateColumns = `repeat(${totalTeams}, minmax(0, 1fr))`;
+      } else {
+        container.style.gridTemplateColumns = 'repeat(5, minmax(0, 1fr))';
+      }
+      
+      container.innerHTML = teams.map((team, i) => `
+        <button data-team-index="${i}" class="px-1.5 py-1.5 rounded-lg bg-gradient-to-r ${team.color} font-bold hover:scale-105 transition-transform border-2 border-transparent hover:border-white text-white text-xs whitespace-nowrap">
+          ${team.name} <br> ₹${team.purse.toFixed(2)}
+        </button>
+      `).join('');
+      
+      // If more than 5 teams, center the remaining teams
+      if (totalTeams > 5) {
+        const buttons = container.querySelectorAll('button');
+        const wrapper = document.createElement('div');
+        const firstFive = Array.from(buttons).slice(0, 5);
+        const remaining = Array.from(buttons).slice(5);
+        
+        container.innerHTML = '';
+        container.className = 'space-y-2';
+        
+        const row1 = document.createElement('div');
+        row1.className = 'grid gap-1';
+        row1.style.gridTemplateColumns = 'repeat(5, minmax(0, 1fr))';
+        firstFive.forEach(btn => row1.appendChild(btn.cloneNode(true)));
+        container.appendChild(row1);
+        
+        const row2 = document.createElement('div');
+        row2.className = 'grid gap-1 justify-center';
+        row2.style.gridTemplateColumns = `repeat(${remaining.length}, minmax(0, 1fr))`;
+        row2.style.maxWidth = `${remaining.length * 100}px`;
+        row2.style.margin = '0 auto';
+        remaining.forEach(btn => row2.appendChild(btn.cloneNode(true)));
+        container.appendChild(row2);
+        
+        // Re-attach event listeners for new buttons
+        container.querySelectorAll('button').forEach((btn, idx) => {
+          btn.addEventListener('click', () => selectTeam(idx));
+        });
+      } else {
+        // Re-attach event listeners for new buttons
+        container.querySelectorAll('button').forEach((btn, idx) => {
+          btn.addEventListener('click', () => selectTeam(idx));
+        });
+      }
+    }
+
+    // Select Team
+    function selectTeam(teamIndex) {
+      currentBidder = teamIndex;
+      // Update visual selection
+      document.querySelectorAll('#team-buttons button, #team-buttons div button').forEach((btn, i) => {
+        if (i === teamIndex) {
+          btn.classList.remove('text-xs');
+          btn.classList.add('ring-2', 'ring-yellow-300', 'text-lg', 'font-black', 'scale-105');
+        } else {
+          btn.classList.add('text-xs');
+          btn.classList.remove('ring-2', 'ring-yellow-300', 'text-lg', 'font-black', 'scale-105');
+        }
+      });
+    }
+
+    // Render Purse Tracker
+    function renderPurseTracker() {
+      const container = document.getElementById('purse-tracker');
+      container.innerHTML = teams.map((team, index) => {
+        const percentage = (team.purse / team.originalPurse) * 100;
+        const barColor = percentage > 50 ? 'from-green-500 to-emerald-500' : 
+                        percentage > 25 ? 'from-yellow-500 to-orange-500' : 
+                        'from-red-500 to-pink-500';
+        
+        return `
+          <div class="bg-gray-800/50 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-bold text-white">${team.name}</span>
+              <span class="text-cyan-400 font-bold">₹${team.purse.toFixed(2)} Cr</span>
+            </div>
+            <div class="h-4 bg-gray-700 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r ${barColor} purse-bar rounded-full" style="width: ${percentage}%"></div>
+            </div>
+            <div class="flex justify-between text-xs text-gray-400 mt-1">
+              <span>${team.players.length} players</span>
+              <span>${percentage.toFixed(1)}% remaining</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Filter Players
+    function filterPlayers() {
+      renderAvailablePlayers();
+    }
+
+    // Render Available Players
+    function renderAvailablePlayers() {
+      const container = document.getElementById('available-players');
+      const countryFilter = document.getElementById('filter-country').value;
+      const roleFilter = document.getElementById('filter-role').value;
+      
+      let filtered = availablePlayers;
+      if (countryFilter) filtered = filtered.filter(p => p.country === countryFilter);
+      if (roleFilter) filtered = filtered.filter(p => p.role === roleFilter);
+
+      document.getElementById('available-count').textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">No players available</p>';
+        return;
+      }
+
+      container.innerHTML = filtered.map((player, index) => `
+        <div class="player-card bg-gray-800/50 rounded-lg p-3 border border-purple-500/20 hover:border-cyan-500/50 cursor-pointer transition-all" onclick="selectPlayer(${allPlayers.indexOf(player)})">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">${player.flag}</span>
+            <div class="flex-1">
+              <h4 class="font-bold text-white">${player.name}</h4>
+              <div class="flex gap-2 text-xs">
+                <span class="text-gray-400">${player.country}</span>
+                <span class="text-cyan-400">• ${player.role}</span>
+              </div>
+            </div>
+            <div class="text-center">
+              <span class="text-3xl block">${player.icon}</span>
+              <span class="text-yellow-400 font-bold text-xs">₹${player.basePrice} Cr</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Select Player
+    function selectPlayer(globalIndex) {
+      const player = allPlayers[globalIndex];
+      if (!availablePlayers.includes(player)) return;
+      
+      currentPlayer = player;
+      currentBid = player.basePrice;
+      currentBidder = null;
+      
+      document.getElementById('player-name').textContent = player.name;
+      document.getElementById('player-country').innerHTML = `${player.flag} ${player.country}`;
+      document.getElementById('player-role').textContent = player.role;
+      document.getElementById('player-type').textContent = player.type;
+      
+      const stats = getPlayerStats(player.name);
+      const statsContainer = document.getElementById('player-stats-container');
+      if (stats) {
+        statsContainer.classList.remove('hidden');
+        statsContainer.innerHTML = Object.entries(stats).map(([key, value]) => `
+          <div class="bg-gray-800/50 rounded px-3 py-2 border border-purple-500/20">
+            <span class="capitalize text-gray-400 text-xs block mb-1">${key.replace(/([A-Z])/g, ' $1').trim()}</span>
+            <span class="font-bold text-white">${value}</span>
+          </div>
+        `).join('');
+      } else {
+        statsContainer.classList.add('hidden');
+        statsContainer.innerHTML = '';
+      }
+      document.getElementById('player-base-price').textContent = `₹${player.basePrice} Cr`;
+      document.getElementById('current-bid').textContent = `₹${currentBid.toFixed(2)} Cr`;
+      document.getElementById('player-avatar').textContent = player.icon;
+      document.getElementById('bidding-team').value = '';
+    }
+
+    // Select Random Player
+    function selectRandomPlayer() {
+      if (availablePlayers.length === 0) {
+        showNotification('🏆 All players have been auctioned!', 'success');
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * availablePlayers.length);
+      selectPlayer(allPlayers.indexOf(availablePlayers[randomIndex]));
+    }
+
+    // Place Bid
+    function placeBid(increment) {
+      if (!currentPlayer) {
+        showNotification('Please select a player first!', 'error');
+        return;
+      }
+
+      if (currentBidder === null) {
+        showNotification('Please select a team to bid!', 'error');
+        return;
+      }
+
+      const team = teams[currentBidder];
+      const newBid = currentBid + increment;
+
+      if (newBid > team.purse) {
+        showNotification(`${team.name} doesn't have enough purse!`, 'error');
+        return;
+      }
+
+      currentBid = newBid;
+      document.getElementById('current-bid').textContent = `₹${currentBid.toFixed(2)} Cr`;
+      document.getElementById('current-bid').classList.add('scale-125');
+      setTimeout(() => document.getElementById('current-bid').classList.remove('scale-125'), 200);
+    }
+
+    // Sold Player
+    function soldPlayer() {
+      if (!currentPlayer) {
+        showNotification('No player selected!', 'error');
+        return;
+      }
+
+      if (currentBidder === null) {
+        showNotification('No bid placed yet!', 'error');
+        return;
+      }
+
+      const team = teams[currentBidder];
+      team.purse -= currentBid;
+      team.players.push({ ...currentPlayer, soldPrice: currentBid });
+      
+      soldPlayers.push({
+        ...currentPlayer,
+        team: team.name,
+        teamColor: team.color,
+        soldPrice: currentBid
+      });
+
+      availablePlayers = availablePlayers.filter(p => p !== currentPlayer);
+      
+      renderPurseTracker();
+      renderAvailablePlayers();
+      renderSoldPlayers();
+      updateBiddingTeamDropdown();
+      
+      showNotification(`${currentPlayer.name} SOLD to ${team.name} for ₹${currentBid.toFixed(2)} Cr! 🎉`, 'success');
+      
+      currentPlayer = null;
+      selectRandomPlayer();
+    }
+
+    // Unsold Player
+    function unsoldPlayer() {
+      if (!currentPlayer) {
+        showNotification('No player selected!', 'error');
+        return;
+      }
+
+      unsoldPlayers.push(currentPlayer);
+      availablePlayers = availablePlayers.filter(p => p !== currentPlayer);
+      
+      renderAvailablePlayers();
+      renderUnsoldPlayers();
+      
+      showNotification(`${currentPlayer.name} goes UNSOLD! ❌`, 'error');
+      
+      currentPlayer = null;
+      selectRandomPlayer();
+    }
+
+    // Next Player (Skip)
+    function nextPlayer() {
+      selectRandomPlayer();
+    }
+
+    // Render Sold Players
+    function renderSoldPlayers() {
+      const container = document.getElementById('sold-players');
+      document.getElementById('sold-count').textContent = soldPlayers.length;
+
+      if (soldPlayers.length === 0) {
+        container.innerHTML = '<p class="text-gray-500 text-center py-8">No players sold yet</p>';
+        return;
+      }
+
+      container.innerHTML = soldPlayers.map((player, index) => `
+        <div class="bg-gradient-to-r ${player.teamColor} p-0.5 rounded-lg fade-in-up" style="animation-delay: ${index * 0.05}s">
+          <div class="bg-gray-900 rounded-lg p-3">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">${player.icon}</span>
+              <div class="flex-1">
+                <h4 class="font-bold text-white text-sm">${player.name}</h4>
+                <p class="text-xs text-gray-400">${player.role}</p>
+              </div>
+              <div class="text-right">
+                <p class="text-green-400 font-bold">₹${player.soldPrice.toFixed(2)} Cr</p>
+                <p class="text-xs text-gray-400">${player.team}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render Unsold Players
+    function renderUnsoldPlayers() {
+      const container = document.getElementById('unsold-players');
+      document.getElementById('unsold-count').textContent = unsoldPlayers.length;
+
+      if (unsoldPlayers.length === 0) {
+        container.innerHTML = '<div class="flex flex-wrap gap-2"><p class="text-gray-500 text-center py-4 w-full">No unsold players yet</p></div>';
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="flex flex-wrap gap-2">
+          ${unsoldPlayers.map(player => `
+            <div class="bg-gray-800/50 rounded-lg px-3 py-2 border border-red-500/30 flex items-center gap-2">
+              <span class="text-2xl">${player.icon}</span>
+              <span class="text-sm text-white">${player.name}</span>
+              <span class="text-xs text-gray-400">(${player.role})</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // Show Notification
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-2xl z-50 slide-in ${
+        type === 'success' ? 'bg-gradient-to-r from-green-500 to-emerald-600' : 
+        type === 'error' ? 'bg-gradient-to-r from-red-500 to-rose-600' : 
+        'bg-gradient-to-r from-blue-500 to-cyan-600'
+      }`;
+      notification.innerHTML = `<p class="font-bold text-white">${message}</p>`;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        notification.style.transition = 'all 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // Initialize
+    initFilters();
+    renderAvailablePlayers();
+    setupEventListeners();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d9bb012e50bb164',t:'MTc3MzA3NjE3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

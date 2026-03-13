@@ -1,0 +1,31 @@
+@keyframes neonPulse {
+  0%, 100% { text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff, 0 0 40px #00f5ff; }
+  50% { text-shadow: 0 0 5px #00f5ff, 0 0 10px #00f5ff, 0 0 20px #00f5ff; }
+}
+@keyframes playerBlink {
+  0%, 100% { opacity: 1; text-shadow: 0 0 20px #00f5ff, 0 0 40px #00f5ff; }
+  50% { opacity: 0.3; text-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de; }
+}
+@keyframes borderGlow {
+  0%, 100% { box-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de, inset 0 0 10px rgba(255,0,222,0.1); }
+  50% { box-shadow: 0 0 5px #ff00de, 0 0 10px #ff00de, inset 0 0 5px rgba(255,0,222,0.05); }
+}
+@keyframes slideIn {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes fadeInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.neon-text { animation: neonPulse 2s ease-in-out infinite; }
+.player-blink { animation: playerBlink 0.8s ease-in-out infinite; }
+.neon-border { animation: borderGlow 2s ease-in-out infinite; }
+.slide-in { animation: slideIn 0.5s ease-out forwards; }
+.fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+.purse-bar { transition: width 0.5s ease-out; }
+.player-card:hover { transform: scale(1.02); transition: transform 0.2s; }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #1a1a2e; }
+::-webkit-scrollbar-thumb { background: #ff00de; border-radius: 4px; }
+body { box-sizing: border-box; }
